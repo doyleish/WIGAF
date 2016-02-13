@@ -9,10 +9,10 @@
    "default_icon": "icon.png",
    "default_popup": "settings.html"
   },
-  "permissions": ["tabs", "*://*whenisgood.net/*"],
+  "permissions": ["tabs", "*://whenisgood.net/*"],
   "content_scripts": [
     {
-      "matches": ["*://*whenisgood.net/*"],
+      "matches": ["*://whenisgood.net/*"],
       "js": ["autofill.js"]
     }
   ]
