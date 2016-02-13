@@ -1,9 +1,21 @@
 <html>
-<script src="settings.js"></script>
     <form>
         First Name: <input type="text" name="firstname"><br>
         Last Name: <input type="text" name="lastname"><br>
-        Timezone: <input type="text" name="tz"<br>
+        Timezone: <input type="text" name="tz"><br>
+        Day start time: <input type="datetime" name="starttime"><br>
+        Day end time: <input type="datetime" name="endtime"><br>
         
     </form>
+    <script src="settings.js"></script>
+    <body>
+        <div id="authorize-div" style="display: inline">
+            <span>Authorize access to Google Calendar API</span>
+            <!--Button for the user to click to initiate auth sequence -->
+            <button id="authorize-button" onclick="handleAuthClick(event)">
+                Authorize
+            </button>
+        </div>
+        <pre id="output"></pre>
+    </body>
 </html>
