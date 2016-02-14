@@ -11,7 +11,7 @@ function checkAuth() {
     {
       'client_id': CLIENT_ID,
       'scope': SCOPE,
-      'immediate': false
+      'immediate': true
     }, handleAuthResult);
 }
 
@@ -21,13 +21,23 @@ function checkAuth() {
  * @param {Object} authResult Authorization result.
  */
 function handleAuthResult(authResult) {
-  var header_obj = document.getElementById('pageTitle');
   console.log(authResult);
   if (authResult && !authResult.error) {
-      header_obj.innerHTML = header_obj.innerHTML + ["<br>",
-      "<button id=\"autofiller\" onClick=\"autofill();\">"
-      ].join('\n')
-      ;
+      loadCalendarApi();
   }
+}
+
+function loadCalendarApi(){
+    gapi.client.load('calendar', 'v3', autofill);
+
+function autofill() {
+    console.log("run autofiller");
+}
+      
+window.onload=function(){
+    var header_obj = document.getElementById('pageTitle');
+    header_obj.innerHTML = header_obj.innerHTML + ["<br>",
+    "<button id=\"autofiller\" onClick=\"checkAuth();\">AUTOFILL</button>"
+    ].join('\n');
 }
 
