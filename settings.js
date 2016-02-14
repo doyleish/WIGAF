@@ -1,6 +1,6 @@
-var CLIENT_ID = '730100849179-i7961ivoafl0d46sj1oopmgd519o0oke.apps.googleusercontent.com';
-
+var CLIENT_ID = '730100849179-idf30ma4u31kqj6l14ahoirjj6719vcu.apps.googleusercontent.com';
 var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
+
 
 /**
  * Check if current user has authorized this application.
@@ -38,8 +38,9 @@ function handleAuthResult(authResult) {
  * @param {Event} event Button click event.
  */
 function handleAuthClick(event) {
+  console.log("made it here");
   gapi.auth.authorize(
-    {client_id: CLIENT_ID, scope: SCOPES, immediate: false},
+    {"client_id": CLIENT_ID, "scope": SCOPES, "immediate": false},
     handleAuthResult);
   return false;
 }
@@ -98,3 +99,8 @@ function appendPre(message) {
   var textContent = document.createTextNode(message + '\n');
   pre.appendChild(textContent);
 }
+
+window.onload=function(){
+    document.getElementById("authorize-button").addEventListener("click", handleAuthClick);
+}
+

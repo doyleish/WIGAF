@@ -9,11 +9,13 @@
    "default_icon": "icon.png",
    "default_popup": "settings.html"
   },
-  "permissions": ["tabs", "*://whenisgood.net/*"],
+  "permissions": ["tabs", "*://www.whenisgood.net/*"],
+  "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
+  "web_accessible_resources": ["autofill.js"],
   "content_scripts": [
     {
-      "matches": ["*://whenisgood.net/*"],
-      "js": ["autofill.js"]
+      "matches": ["*://www.whenisgood.net/*"],
+      "js": ["scriptLoader.js"]
     }
   ]
 }
