@@ -1,10 +1,9 @@
-var CLIENT_ID = '730100849179-idf30ma4u31kqj6l14ahoirjj6719vcu.apps.googleusercontent.com';
+var CLIENT_ID = '730100849179-ph63g7r984eqhm3628cagulrbbbbh9e2.apps.googleusercontent.com';
 var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
 
 
 /**
  * Check if current user has authorized this application.
- */
 function checkAuth() {
   gapi.auth.authorize(
     {
@@ -13,6 +12,7 @@ function checkAuth() {
       'immediate': true
     }, handleAuthResult);
 }
+*/
 
 /**
  * Handle response from authorization server.
@@ -57,7 +57,6 @@ function loadCalendarApi() {
  * Print the summary and start datetime/date of the next ten events in
  * the authorized user's calendar. If no events are found an
  * appropriate message is printed.
- */
 function listUpcomingEvents() {
   var request = gapi.client.calendar.events.list({
     'calendarId': 'primary',
@@ -88,7 +87,6 @@ function listUpcomingEvents() {
   });
 }
 
-/**
  * Append a pre element to the body containing the given message
  * as its text node.
  *
@@ -99,6 +97,7 @@ function appendPre(message) {
   var textContent = document.createTextNode(message + '\n');
   pre.appendChild(textContent);
 }
+
 
 window.onload=function(){
     document.getElementById("authorize-button").addEventListener("click", handleAuthClick);
