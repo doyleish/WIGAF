@@ -4,7 +4,18 @@ var SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 /**
  * Check if current user has authorized this application.
  */
-function checkAuth(event) {
+function checkAuth() {
+
+    console.log("hooorraay");
+    gapi.auth.authorize({
+        'client_id': CLIENT_ID,
+        'scope': SCOPE,
+        'immediate': true
+    }, handleAuthResult);
+    console.log("hooorraay2");
+}
+
+function handleClickAuth() {
 
     console.log("hooorraay");
     gapi.auth.authorize({
@@ -12,6 +23,7 @@ function checkAuth(event) {
         'scope': SCOPE,
         'immediate': false
     }, handleAuthResult);
+    console.log("hooorraay2");
 }
 
 /**
@@ -22,18 +34,22 @@ function checkAuth(event) {
 function handleAuthResult(authResult) {
     console.log(authResult);
     if (authResult && !authResult.error) {
-        loadCalendarApi();
+        var header_obj = document.getElementById('pageTitle');
+        header_obj.innerHTML = header_obj.innerHTML + '<br><button type="button" onClick="loadCalendarApi();">AUTOFILL</button>';
+        
+    } else {
+        var header_obj = document.getElementById('pageTitle');
+        header_obj.innerHTML = header_obj.innerHTML + '<br><button onClick="handleClickAuth();">AUTHENTICATE GCAL</button>';
     }
+
 }
 
 function loadCalendarApi() {
-    gapi.client.load('calendar', 'v3', autofill);
+    console.log("do nothing");
+    //gapi.client.load('calendar', 'v3', autofill);
 }
 
 function autofill() {
     console.log("run autofiller");
 }
 
-
-var header_obj = document.getElementById('pageTitle');
-header_obj.innerHTML = header_obj.innerHTML + '<br><button id="autofiller" onClick="checkAuth(event);">AUTOFILL</button>';
