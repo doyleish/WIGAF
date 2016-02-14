@@ -4,14 +4,13 @@ var SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 /**
  * Check if current user has authorized this application.
  */
-function checkAuth() {
-  
-  console.log("hooorraay");
-  gapi.auth.authorize(
-    {
-      'client_id': CLIENT_ID,
-      'scope': SCOPE,
-      'immediate': true
+function checkAuth(event) {
+
+    console.log("hooorraay");
+    gapi.auth.authorize({
+        'client_id': CLIENT_ID,
+        'scope': SCOPE,
+        'immediate': false
     }, handleAuthResult);
 }
 
@@ -21,23 +20,20 @@ function checkAuth() {
  * @param {Object} authResult Authorization result.
  */
 function handleAuthResult(authResult) {
-  console.log(authResult);
-  if (authResult && !authResult.error) {
-      loadCalendarApi();
-  }
+    console.log(authResult);
+    if (authResult && !authResult.error) {
+        loadCalendarApi();
+    }
 }
 
-function loadCalendarApi(){
+function loadCalendarApi() {
     gapi.client.load('calendar', 'v3', autofill);
+}
 
 function autofill() {
     console.log("run autofiller");
 }
-      
-window.onload=function(){
-    var header_obj = document.getElementById('pageTitle');
-    header_obj.innerHTML = header_obj.innerHTML + ["<br>",
-    "<button id=\"autofiller\" onClick=\"checkAuth();\">AUTOFILL</button>"
-    ].join('\n');
-}
 
+
+var header_obj = document.getElementById('pageTitle');
+header_obj.innerHTML = header_obj.innerHTML + '<br><button id="autofiller" onClick="checkAuth(event);">AUTOFILL</button>';
