@@ -3,12 +3,8 @@
 
   "name": "WIGAF",
   "description": "This extension will use your google calendar to auto-fill whenisgood pages.",
-  "version": "0.0.2",
+  "version": "0.0.3",
 
-  "browser_action": {
-   "default_icon": "icon.png",
-   "default_popup": "settings.html"
-  },
   "permissions": ["tabs", "*://www.whenisgood.net/*"],
   "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
   "web_accessible_resources": ["autofill.js"],

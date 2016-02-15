@@ -2,6 +2,7 @@ var CLIENT_ID = '730100849179-n047mcmlc01nc9164e44334v4lmbeukn.apps.googleuserco
 var SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 
 
+//Init code
 
 /**
  * Analyzing the total number of times and
@@ -19,29 +20,24 @@ console.log(times_by_id.length);
 
 
 
+
 /**
  * Check if current user has authorized this application.
  */
 function checkAuth() {
-
-    console.log("hooorraay");
     gapi.auth.authorize({
         'client_id': CLIENT_ID,
         'scope': SCOPE,
         'immediate': true
     }, handleAuthResult);
-    console.log("hooorraay2");
 }
 
 function handleClickAuth() {
-
-    console.log("hooorraay");
     gapi.auth.authorize({
         'client_id': CLIENT_ID,
         'scope': SCOPE,
         'immediate': false
     }, handleAuthResult);
-    console.log("hooorraay2");
 }
 
 /**
@@ -50,17 +46,43 @@ function handleClickAuth() {
  * @param {Object} authResult Authorization result.
  */
 function handleAuthResult(authResult) {
-    console.log(authResult);
     if (authResult && !authResult.error) {
         var header_obj = document.getElementById('pageTitle');
-        header_obj.innerHTML = header_obj.innerHTML + '<br><button type="button" onClick="loadCalendarApi();">AUTOFILL</button>';
+        try{
+            document.getElementById("auth_button_temp").setAttribute("onClick","loadCalendarApi()");
+            document.getElementById("auth_button_temp").innerText = "AUTOFILL";
+            initSettings();
+        }catch (e){
+            header_obj.innerHTML = header_obj.innerHTML + '<br><button type="button" onClick="loadCalendarApi();">AUTOFILL</button>';
+            initSettings();
+        }
         
     } else {
         var header_obj = document.getElementById('pageTitle');
-        header_obj.innerHTML = header_obj.innerHTML + '<br><button type="button" onClick="handleClickAuth();">AUTHENTICATE GCAL</button>';
+        header_obj.innerHTML = header_obj.innerHTML + '<br><button id="auth_button_temp" type="button" onClick="handleClickAuth();">AUTHENTICATE GCAL</button>';
     }
 
 }
+
+function initSettings(){
+    var header_obj = document.getElementById('pageTitle');
+    header_obj.innerHTML = header_obj.innerHTML + '<br><select multiple id="calendar_selection"></select>';
+    var cal_select = document.getElementById('calendar_selection');
+    gapi.client.load('calendar', 'v3', function(){
+
+        var cal_req = gapi.client.calendar.calendarList.list();
+        cal_req.execute(function(resp){
+            for(i=0;i<resp['items'].length;i++){
+                var option = document.createElement("option");
+                option.text = resp['items'][i]['summary'];
+                option.value = resp['items'][i]['id'];
+                cal_select.add(option);
+            }
+        });
+
+    });
+}
+
 
 function loadCalendarApi() {
     gapi.client.load('calendar', 'v3', autofill);
@@ -73,37 +95,23 @@ function autofill() {
 }
 
 function doAll(i){
-    //var temparr = [];
-    var current_id;
-    var current_day;
-    var weekday;
-    var date;
-    var month;
-    var year;
-    var time;
-    var date1;
-    var date2;
-    var request;
-    var value;
     
-    current_time = document.getElementById(times_by_id[i]);
-    time = current_time.childNodes[1].innerText;
+    var current_time = document.getElementById(times_by_id[i]);
+    var time = current_time.childNodes[1].innerText;
     if(time==""){return;} //This is to catch potentially blank table entries
     
-    current_id = times_by_id[i];
-    console.log(i+ " " + current_id);
-    current_day = days_raw[i%(days_raw.length)];
-    weekday = current_day.childNodes[1].innerText;
-    date = current_day.childNodes[3].innerText;
-    month = current_day.childNodes[5].innerText;
-    year = "2016";
-    console.log(dateify(weekday, date, month, year, time, false));
-    date1 = new Date(dateify(weekday, date, month, year, time, false)).toISOString();
-    date2 = new Date(dateify(weekday, date, month, year, time, true)).toISOString();
+    var current_id = times_by_id[i];
+    var current_day = days_raw[i%(days_raw.length)];
+    var weekday = current_day.childNodes[1].innerText;
+    var date = current_day.childNodes[3].innerText;
+    var month = current_day.childNodes[5].innerText;
+    var year = "2016";
+    var date1 = new Date(dateify(weekday, date, month, year, time, false));
+    var date2 = new Date(date1.getTime() + 60*60000); //looking over the next 60 minutes.
 
-    request = gapi.client.calendar.freebusy.query({
-        'timeMin': date1,
-        'timeMax': date2,
+    var request = gapi.client.calendar.freebusy.query({
+        'timeMin': date1.toISOString(),
+        'timeMax': date2.toISOString(),
         'timeZone': 'EST',
         'items': [
             {'id':'rcdoyle@mtu.edu'}
@@ -122,7 +130,7 @@ function doAll(i){
 }
 
 
-function dateify(weekday, date, month, year, time, offset){
+function dateify(weekday, date, month, year, time){
     var hour = 0;
     var minute = 0;
     var hour_str = "";
@@ -132,7 +140,6 @@ function dateify(weekday, date, month, year, time, offset){
     hour = parseInt(time.split(' ')[0].split(':')[0]);
     minute = parseInt(time.split(' ')[0].split(':')[1]);
     if(hour==12){hour=0;}
-    if(offset){hour+=1}
     
     if(ampm=="pm"){ hour+=12; }
     
