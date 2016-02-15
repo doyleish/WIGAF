@@ -49,7 +49,7 @@ function handleAuthClick(event) {
  * Load Google Calendar client library. List upcoming events
  * once client library is loaded.
  */
-function loadCalendarApi() {
+function loadCalendarAp() {
   gapi.client.load('calendar', 'v3', listUpcomingEvents);
 }
 
@@ -57,6 +57,7 @@ function loadCalendarApi() {
  * Print the summary and start datetime/date of the next ten events in
  * the authorized user's calendar. If no events are found an
  * appropriate message is printed.
+ */
 function listUpcomingEvents() {
   var request = gapi.client.calendar.events.list({
     'calendarId': 'primary',
@@ -87,7 +88,7 @@ function listUpcomingEvents() {
   });
 }
 
- * Append a pre element to the body containing the given message
+/** Append a pre element to the body containing the given message
  * as its text node.
  *
  * @param {string} message Text to be placed in pre element.
