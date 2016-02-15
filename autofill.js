@@ -8,17 +8,14 @@ var SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
  * obtaining availability in a blocking fashion
  */
 var days_raw = document.getElementsByClassName("dateHeader weekday");
-times_raw = document.getElementsByClassName("proposed");
-times_by_id = new Array(); //starting these at 1 to prevent js thinking I'm obtaining .toString on a whole array
-return_val_req = 0;
+var times_raw = document.getElementsByClassName("proposed");
+var times_by_id = new Array(); //starting these at 1 to prevent js thinking I'm obtaining .toString on a whole array
 
-times_by_id.push("");
-for(i=1;i<=times_raw.length;i++){
-    times_by_id.push(times_raw[i-1].id);
+for(i=0;i<times_raw.length;i++){
+    times_by_id.push(times_raw[i].id);
 }
 console.log(times_by_id);
 console.log(times_by_id.length);
-console.log(document.getElementById(times_by_id[1]));
 
 
 
@@ -70,7 +67,7 @@ function loadCalendarApi() {
 }
 
 function autofill() {
-    for(i=1;i<times_by_id.length;i++){
+    for(i=0;i<times_by_id.length;i++){
         doAll(i);
     }
 }
@@ -90,6 +87,9 @@ function doAll(i){
     var value;
     
     current_time = document.getElementById(times_by_id[i]);
+    time = current_time.childNodes[1].innerText;
+    if(time==""){return;} //This is to catch potentially blank table entries
+    
     current_id = times_by_id[i];
     console.log(i+ " " + current_id);
     current_day = days_raw[i%(days_raw.length)];
@@ -97,8 +97,6 @@ function doAll(i){
     date = current_day.childNodes[3].innerText;
     month = current_day.childNodes[5].innerText;
     year = "2016";
-    time = current_time.childNodes[1].innerText;
-    if(time==""){return;}
     console.log(dateify(weekday, date, month, year, time, false));
     date1 = new Date(dateify(weekday, date, month, year, time, false)).toISOString();
     date2 = new Date(dateify(weekday, date, month, year, time, true)).toISOString();
@@ -115,18 +113,14 @@ function doAll(i){
         var retval;
         for (x in resp['calendars']){
             retval = resp['calendars'][x]['busy'].length;
+            break;
         }
 
-        afterExec(i, retval);
+        if(retval == 0){ document.getElementById(times_by_id[i]).className = "canDo"; }
     });
     
 }
 
-
-function afterExec(id, bool){
-    console.log(id + " asdf " + bool);
-    if(bool == 0){ document.getElementById(times_by_id[id]).className = "canDo"; }
-}
 
 function dateify(weekday, date, month, year, time, offset){
     var hour = 0;
