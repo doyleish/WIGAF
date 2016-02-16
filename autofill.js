@@ -15,6 +15,7 @@ var times_by_id = new Array(); //starting these at 1 to prevent js thinking I'm 
 for(i=0;i<times_raw.length;i++){
     times_by_id.push(times_raw[i].id);
 }
+
 console.log(times_by_id);
 console.log(times_by_id.length);
 
@@ -89,13 +90,19 @@ function loadCalendarApi() {
 }
 
 function autofill() {
+
+    for(i=0;i<times_by_id.length;i++){
+        document.getElementById(times_by_id[i]).className="canDo";
+    }
+
     for(i=0;i<times_by_id.length;i++){
         doAll(i);
     }
 }
 
 function doAll(i){
-    
+    var calendars = document.getElementById("calendar_selection");
+    calendars.selectedOptions
     var current_time = document.getElementById(times_by_id[i]);
     var time = current_time.childNodes[1].innerText;
     if(time==""){return;} //This is to catch potentially blank table entries
@@ -108,24 +115,26 @@ function doAll(i){
     var year = "2016";
     var date1 = new Date(dateify(weekday, date, month, year, time, false));
     var date2 = new Date(date1.getTime() + 60*60000); //looking over the next 60 minutes.
-
-    var request = gapi.client.calendar.freebusy.query({
-        'timeMin': date1.toISOString(),
-        'timeMax': date2.toISOString(),
-        'timeZone': 'EST',
-        'items': [
-            {'id':'rcdoyle@mtu.edu'}
-        ]
-    });
-    request.execute(function(resp) {
-        var retval;
-        for (x in resp['calendars']){
-            retval = resp['calendars'][x]['busy'].length;
-            break;
-        }
-
-        if(retval == 0){ document.getElementById(times_by_id[i]).className = "canDo"; }
-    });
+    
+    for(j=0;j<calendars.selectedOptions.length;j++){
+        var request = gapi.client.calendar.freebusy.query({
+            'timeMin': date1.toISOString(),
+            'timeMax': date2.toISOString(),
+            'timeZone': 'EST',
+            'items': [
+                {'id':calendars.selectedOptions[j]['value']}
+            ]
+        });
+        request.execute(function(resp) {
+            var retval;
+            for (x in resp['calendars']){
+                retval = resp['calendars'][x]['busy'].length;
+                break;
+            }
+    
+            if(retval > 0){ document.getElementById(times_by_id[i]).className = "proposed";}
+        });
+    }
     
 }
 

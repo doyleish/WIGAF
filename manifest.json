@@ -10,7 +10,7 @@
   "web_accessible_resources": ["autofill.js"],
   "content_scripts": [
     {
-      "matches": ["*://www.whenisgood.net/*"],
+      "matches": ["*://www.whenisgood.net/*","*://whenisgood.net/*"],
       "js": ["scriptLoader.js"]
     }
   ]
