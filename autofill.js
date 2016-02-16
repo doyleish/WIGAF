@@ -67,7 +67,58 @@ function handleAuthResult(authResult) {
 
 function initSettings(){
     var header_obj = document.getElementById('pageTitle');
-    header_obj.innerHTML = header_obj.innerHTML + '<br><br><select multiple id="calendar_selection"></select>';
+    header_obj.innerHTML = header_obj.innerHTML + '<br><br>Calendars (ctrl-click to multi-select): <select multiple id="calendar_selection"></select>';
+    header_obj.innerHTML = header_obj.innerHTML + '<br><br>Start Time (do not schedule before): <select id="starttime_selection"></select>';
+    header_obj.innerHTML = header_obj.innerHTML + '<br><br>End Time (do not schedule after): <select id="endtime_selection"></select>';
+    header_obj.innerHTML = header_obj.innerHTML + '<br><br>Event Length (minutes): <select id="lengthtime_selection"></select>';
+    var start_array = [
+        '6:00 am',
+        '7:00 am',
+        '8:00 am',
+        '9:00 am',
+       '10:00 am',
+       '11:00 am'
+    ];
+    
+    var end_array = [
+       '11:00 pm',
+       '10:00 pm',
+        '9:00 pm',
+        '8:00 pm',
+        '7:00 pm',
+        '6:00 pm',
+        '5:00 pm',
+        '4:00 pm',
+        '3:00 pm'
+    ];
+    
+    var len_array = [
+        '60',
+        '120',
+        '30',
+        '15'
+    ]
+    
+    var start = document.getElementById('starttime_selection');
+    var end = document.getElementById('endtime_selection');
+    var lentime = document.getElementById('lengthtime_selection');
+    for(i=0;i<start_array.length;i++){
+        var option = document.createElement("option");
+        option.text = start_array[i];
+        start.add(option);
+    }
+    for(i=0;i<end_array.length;i++){
+        var option = document.createElement("option");
+        option.text = end_array[i];
+        end.add(option);
+    }
+    for(i=0;i<len_array.length;i++){
+        var option = document.createElement("option");
+        option.text = len_array[i];
+        lentime.add(option);
+    }
+
+
     var cal_select = document.getElementById('calendar_selection');
     gapi.client.load('calendar', 'v3', function(){
 
@@ -102,6 +153,9 @@ function autofill() {
 
 function doAll(i){
     var calendars = document.getElementById("calendar_selection");
+    var start_time = document.getElementById("starttime_selection").options[document.getElementById("starttime_selection").selectedIndex].text;
+    var end_time = document.getElementById("endtime_selection").options[document.getElementById("endtime_selection").selectedIndex].text;
+    var length_time = parseInt(document.getElementById("lengthtime_selection").options[document.getElementById("lengthtime_selection").selectedIndex].text);
     calendars.selectedOptions
     var current_time = document.getElementById(times_by_id[i]);
     var time = current_time.childNodes[1].innerText;
@@ -113,8 +167,12 @@ function doAll(i){
     var date = current_day.childNodes[3].innerText;
     var month = current_day.childNodes[5].innerText;
     var year = "2016";
-    var date1 = new Date(dateify(weekday, date, month, year, time, false));
-    var date2 = new Date(date1.getTime() + 60*60000); //looking over the next 60 minutes.
+    var startdate = new Date(dateify(weekday, date, month, year, start_time));
+    var enddate = new Date(dateify(weekday, date, month, year, end_time));
+    var date1 = new Date(dateify(weekday, date, month, year, time));
+    var date2 = new Date(date1.getTime() + length_time*60000); //looking over the next 60 minutes.
+    if(date1.getTime()<startdate.getTime()){document.getElementById(times_by_id[i]).className = "proposed"; return;}
+    if(date2.getTime()>enddate.getTime()){document.getElementById(times_by_id[i]).className = "proposed"; return;}
     
     for(j=0;j<calendars.selectedOptions.length;j++){
         var request = gapi.client.calendar.freebusy.query({
