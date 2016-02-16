@@ -54,20 +54,20 @@ function handleAuthResult(authResult) {
             document.getElementById("auth_button_temp").innerText = "AUTOFILL";
             initSettings();
         }catch (e){
-            header_obj.innerHTML = header_obj.innerHTML + '<br><button type="button" onClick="loadCalendarApi();">AUTOFILL</button>';
+            header_obj.innerHTML = header_obj.innerHTML + '<br><br><button style="font-size:20pt" type="button" onClick="loadCalendarApi();">AUTOFILL</button>';
             initSettings();
         }
         
     } else {
         var header_obj = document.getElementById('pageTitle');
-        header_obj.innerHTML = header_obj.innerHTML + '<br><button id="auth_button_temp" type="button" onClick="handleClickAuth();">AUTHENTICATE GCAL</button>';
+        header_obj.innerHTML = header_obj.innerHTML + '<br><br><button style="font-size:20pt" id="auth_button_temp" type="button" onClick="handleClickAuth();">AUTHENTICATE GCAL</button>';
     }
 
 }
 
 function initSettings(){
     var header_obj = document.getElementById('pageTitle');
-    header_obj.innerHTML = header_obj.innerHTML + '<br><select multiple id="calendar_selection"></select>';
+    header_obj.innerHTML = header_obj.innerHTML + '<br><br><select multiple id="calendar_selection"></select>';
     var cal_select = document.getElementById('calendar_selection');
     gapi.client.load('calendar', 'v3', function(){
 
