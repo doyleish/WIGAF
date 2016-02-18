@@ -1,13 +1,14 @@
-var sscript = document.createElement('script'); //settings
+/**
+ * This script is executed in an isolated, chrome-created environment
+ * having access to chrome js entrypoints and the loaded document. In
+ * this case, the loaded document is the whenisgood page.  The only purpose
+ * of this script is to load up the autofill.js source and subsequently,
+ * the google client script with an onload callback to the authentication
+ * entrypoint in autofill.js
+ */
+
 var script = document.createElement('script');
 var gscript = document.createElement('script');
-
-//global variable settings
-sscript.type = 'text/javascript';
-
-var tmp_text = [];
-sscript.text = tmp_text.join('\n');
-
 
 
 script.type = 'text/javascript';

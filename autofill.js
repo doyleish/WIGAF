@@ -2,28 +2,32 @@ var CLIENT_ID = '730100849179-n047mcmlc01nc9164e44334v4lmbeukn.apps.googleuserco
 var SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 
 
-//Init code
-
 /**
+ * This is the setup code for the script.
+ * 
  * Analyzing the total number of times and
  * obtaining availability in a blocking fashion
  */
 var days_raw = document.getElementsByClassName("dateHeader weekday");
 var times_raw = document.getElementsByClassName("proposed");
-var times_by_id = new Array(); //starting these at 1 to prevent js thinking I'm obtaining .toString on a whole array
+var times_by_id = new Array(); //starting these at 
 
 for(i=0;i<times_raw.length;i++){
     times_by_id.push(times_raw[i].id);
 }
 
-console.log(times_by_id);
-console.log(times_by_id.length);
-
+//
+// END setup code
+//
 
 
 
 /**
  * Check if current user has authorized this application.
+ * The non-immediate (popup) authentication request is only
+ * for the situation that the immediate failed and the user
+ * clicked on the Gcal authorize button. Separate methods so
+ * that the api callback onload has an argumentless option.
  */
 function checkAuth() {
     gapi.auth.authorize({
@@ -43,7 +47,9 @@ function handleClickAuth() {
 
 /**
  * Handle response from authorization server.
- *
+ * Depending on if auth was successfull or not, present the authenticate button and do not load settings.
+ * Or, if successfull, change button to autofill and load the settings inputs.
+ * 
  * @param {Object} authResult Authorization result.
  */
 function handleAuthResult(authResult) {
@@ -65,6 +71,12 @@ function handleAuthResult(authResult) {
 
 }
 
+/**
+ * 
+ * Initialize the settings inputs. Calendars selection multi-select, start and end times and event length.
+ * 
+ * 
+ */
 function initSettings(){
     var header_obj = document.getElementById('pageTitle');
     header_obj.innerHTML = header_obj.innerHTML + '<br><br>Calendars (ctrl-click to multi-select): <select multiple id="calendar_selection"></select>';
@@ -147,11 +159,11 @@ function autofill() {
     }
 
     for(i=0;i<times_by_id.length;i++){
-        doAll(i);
+        singlefill(i);
     }
 }
 
-function doAll(i){
+function singlefill(i){
     var calendars = document.getElementById("calendar_selection");
     var start_time = document.getElementById("starttime_selection").options[document.getElementById("starttime_selection").selectedIndex].text;
     var end_time = document.getElementById("endtime_selection").options[document.getElementById("endtime_selection").selectedIndex].text;
@@ -159,7 +171,7 @@ function doAll(i){
     calendars.selectedOptions
     var current_time = document.getElementById(times_by_id[i]);
     var time = current_time.childNodes[1].innerText;
-    if(time==""){return;} //This is to catch potentially blank table entries
+    if(time==""){return;} //This is to catch potentially blank table entries (i.e. the creator of the WIG request did not mark it as available);
     
     var current_id = times_by_id[i];
     var current_day = days_raw[i%(days_raw.length)];
@@ -196,7 +208,10 @@ function doAll(i){
     
 }
 
-
+/*
+ *
+ *
+ */
 function dateify(weekday, date, month, year, time){
     var hour = 0;
     var minute = 0;
