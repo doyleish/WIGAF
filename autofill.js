@@ -10,8 +10,14 @@ var SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
  */
 var days_raw = document.getElementsByClassName("dateHeader weekday");
 var times_raw = document.getElementsByClassName("proposed");
-var times_by_id = new Array(); //starting these at 
+var times_by_id = new Array(); //starting these at
+var datestr = new Date().toString().split(" ");
 
+var tz = datestr[datestr.length-1].split(")")[0].split("(")[1];
+var year = datestr[3];
+
+// We set up the id array since the DOM representation changes when we
+// start changing the classes of the time elements
 for(i=0;i<times_raw.length;i++){
     times_by_id.push(times_raw[i].id);
 }
@@ -72,10 +78,7 @@ function handleAuthResult(authResult) {
 }
 
 /**
- * 
  * Initialize the settings inputs. Calendars selection multi-select, start and end times and event length.
- * 
- * 
  */
 function initSettings(){
     var header_obj = document.getElementById('pageTitle');
@@ -114,6 +117,8 @@ function initSettings(){
     var start = document.getElementById('starttime_selection');
     var end = document.getElementById('endtime_selection');
     var lentime = document.getElementById('lengthtime_selection');
+    var cal_select = document.getElementById('calendar_selection');
+    
     for(i=0;i<start_array.length;i++){
         var option = document.createElement("option");
         option.text = start_array[i];
@@ -131,7 +136,6 @@ function initSettings(){
     }
 
 
-    var cal_select = document.getElementById('calendar_selection');
     gapi.client.load('calendar', 'v3', function(){
 
         var cal_req = gapi.client.calendar.calendarList.list();
@@ -147,11 +151,18 @@ function initSettings(){
     });
 }
 
-
+/**
+ * Loads the calendar api into namespace and calls back to the autofill function
+ * with the authenticated gapi.client. 
+ */
 function loadCalendarApi() {
     gapi.client.load('calendar', 'v3', autofill);
 }
 
+/**
+ * Initialize all times to good then start iterating over
+ * all potential times and sending the indecies to singlefill
+ */
 function autofill() {
 
     for(i=0;i<times_by_id.length;i++){
@@ -163,6 +174,11 @@ function autofill() {
     }
 }
 
+/**
+ * analyze a single time and create a date object out of it. 
+ * send the date object to the calendar api to see if busy at
+ * that time.
+ */
 function singlefill(i){
     var calendars = document.getElementById("calendar_selection");
     var start_time = document.getElementById("starttime_selection").options[document.getElementById("starttime_selection").selectedIndex].text;
@@ -178,11 +194,11 @@ function singlefill(i){
     var weekday = current_day.childNodes[1].innerText;
     var date = current_day.childNodes[3].innerText;
     var month = current_day.childNodes[5].innerText;
-    var year = "2016";
-    var startdate = new Date(dateify(weekday, date, month, year, start_time));
-    var enddate = new Date(dateify(weekday, date, month, year, end_time));
-    var date1 = new Date(dateify(weekday, date, month, year, time));
-    var date2 = new Date(date1.getTime() + length_time*60000); //looking over the next 60 minutes.
+    var startdate = new Date(dateify(weekday, date, month, start_time));
+    var enddate = new Date(dateify(weekday, date, month, end_time));
+    var date1 = new Date(dateify(weekday, date, month, time));
+    var date2 = new Date(date1.getTime() + length_time*60000); //looking over the next length_time minutes.
+
     if(date1.getTime()<startdate.getTime()){document.getElementById(times_by_id[i]).className = "proposed"; return;}
     if(date2.getTime()>enddate.getTime()){document.getElementById(times_by_id[i]).className = "proposed"; return;}
     
@@ -190,7 +206,7 @@ function singlefill(i){
         var request = gapi.client.calendar.freebusy.query({
             'timeMin': date1.toISOString(),
             'timeMax': date2.toISOString(),
-            'timeZone': 'EST',
+            'timeZone': tz,
             'items': [
                 {'id':calendars.selectedOptions[j]['value']}
             ]
@@ -205,14 +221,16 @@ function singlefill(i){
             if(retval > 0){ document.getElementById(times_by_id[i]).className = "proposed";}
         });
     }
-    
 }
 
 /*
+ * from the strings provided by the page, we need to create
+ * a string that can be passed to the Date object constructor
  *
- *
+ * @return the string that can be used to create date object.
+ * 
  */
-function dateify(weekday, date, month, year, time){
+function dateify(weekday, date, month, time){
     var hour = 0;
     var minute = 0;
     var hour_str = "";
@@ -240,7 +258,6 @@ function dateify(weekday, date, month, year, time){
     if(parseInt(date)<10){
         date = '0' + date;
     }
-    
 
-    return weekday + ', ' + date + " " + month + " " + year + " " + hour_str + ":" + min_str + ":00 EST";
+    return weekday + ', ' + date + " " + month + " " + year + " " + hour_str + ":" + min_str + ":00 " + tz;
 }
